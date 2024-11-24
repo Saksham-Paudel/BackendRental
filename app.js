@@ -1,7 +1,7 @@
 require("dotenv").config()
 const express = require("express")
 const connectToDb = require(".")
-const { registerUser, loginUser } = require("./controller")
+const { registerUser, loginUser ,forgetPassword} = require("./controller")
 const app = express()
 
 connectToDb()
@@ -9,9 +9,12 @@ connectToDb()
 
 app.use(express.json())  //incoming json data bujna sakne  capability dinxa
 
+
+
 //register api
 app.post("/register",registerUser)
-app.post("/login",loginUser)
+app.post("/login",loginUser) 
+app.post("/forgetpassword",forgetPassword)
 
 const PORT = process.env.PORT
 app.listen(PORT,()=>{
