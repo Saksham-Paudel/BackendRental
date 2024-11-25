@@ -2,6 +2,7 @@ const User = require("../model/userModel")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
 const sendMail = require("../services/sendMail")
+const generateOtp = require("../services/generateOtp")
 
 exports.registerUser = async (req, res) => {
     try {
@@ -63,55 +64,108 @@ exports.loginUser = async (req, res) => {
 
             //password check
             const isPasswordMatched = bcrypt.compareSync(password, data[0].password)     //return boolean
-            if (isPasswordMatched){
+            if (isPasswordMatched) {
 
-                
+
                 var token = jwt.sign({
-                    id: data[0]._id }, process.env.JWT_SECRET_KEY,
-                    
-                    {expiresIn: process.env.JWT_EXP_IN
-                    })
-                    
-                    
-                    res.status(200).json({
-                        
-                        message: "loggedin success",
-                        token
-                    })
-                
-                }
-        else {
-            res.status(404).json({
-                message: "invalid password"
-            })
-        }
-    }
- 
-}   catch (error) {
-    res.status(404).json({
+                    id: data[0]._id
+                }, process.env.JWT_SECRET_KEY,
 
-        message: "error xa",
-        errmessage: error.message
-    })
-    
+                    {
+                        expiresIn: process.env.JWT_EXP_IN
+                    })
+
+
+                res.status(200).json({
+
+                    message: "loggedin success",
+                    token
+                })
+
+            }
+            else {
+                res.status(404).json({
+                    message: "invalid password"
+                })
+            }
+        }
+
+    } catch (error) {
+        res.status(404).json({
+
+            message: "error xa",
+            errmessage: error.message
+        })
+
     }
 }
 
 
-exports.forgetPassword = async(req,res)=>{
-    const {email} = req.body
-    if(!email)
-    {
-        res.status(400).json({
-            message : " plese peovid email"
-        })
-        return 
-    }
-    var otp = 1234
+exports.forgetPassword = async (req, res) => {
+    try {
+        const { email } = req.body
 
-    await sendMail(email,otp)
-    res.status(200).json
-({
-    message : "otp send success"
-})
+        var data = await User.find({ email: email })
+        if (data.length === 0) {
+            return res.status(404).json({
+                message: "no user register with this email"
+            })
+        }
+        if (!email) {
+            res.status(400).json({
+                message: " plese peovid email"
+            })
+            return
+        }
+
+        var otp = generateOtp()
+        data[0].otp = otp
+        await data[0].save()
+
+        await sendMail(email, otp)
+        res.status(200).json
+            ({
+                message: "otp send success"
+            })
+    }
+
+    catch (error) {
+        res.status(500).json({
+            message: "error",
+            errormessage: error.message
+        })
+    }
+}
+
+exports.resetPassword =async (req,res)=>{
+    try{
+        const {otp,newPassword} = req.body
+    if(!otp || !newPassword){
+        return res.status(400).json({
+            message : "please provide otp,newpassword"
+        })
+    }
+
+    //otp verify, whwether yo otp xa ki xaina
+
+    const [data] = await User.find({otp : otp})
+    if(!data){
+        return res.status(404).json({
+            message : "invlid otp"
+        })
+    }
+    data.password = bcrypt.hashSync(newPassword,10)
+    await data.save()
+    res.status(200).json({
+        message : "password reset successfully"
+    })
+    }
+    catch(error)
+    {
+        res.ststus(500).json({
+
+            message : "Error",
+            errormessage : error.message
+        })
+    }
 }
