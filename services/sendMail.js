@@ -13,8 +13,8 @@ async function sendMail(email,otp){
     })
     await transporter.sendMail({
         to : email,
-        subject : "you receive message",
-        text : "HDC"
+        subject : "you receive message" ,
+        text : "HDC" + otp
     })
 }
 module.exports = sendMail

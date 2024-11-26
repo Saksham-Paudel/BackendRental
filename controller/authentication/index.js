@@ -1,8 +1,8 @@
-const User = require("../model/userModel")
+const User = require("../../model/userModel")
 const bcrypt = require("bcryptjs")
 const jwt = require("jsonwebtoken")
-const sendMail = require("../services/sendMail")
-const generateOtp = require("../services/generateOtp")
+const sendMail = require("../../services/sendMail")
+const generateOtp = require("../../services/generateOtp")
 
 exports.registerUser = async (req, res) => {
     try {
@@ -101,6 +101,9 @@ exports.loginUser = async (req, res) => {
 }
 
 
+
+//forget password
+
 exports.forgetPassword = async (req, res) => {
     try {
         const { email } = req.body
@@ -137,6 +140,10 @@ exports.forgetPassword = async (req, res) => {
     }
 }
 
+
+
+//reset password
+
 exports.resetPassword =async (req,res)=>{
     try{
         const {otp,newPassword} = req.body
@@ -162,7 +169,7 @@ exports.resetPassword =async (req,res)=>{
     }
     catch(error)
     {
-        res.ststus(500).json({
+        res.status(500).json({
 
             message : "Error",
             errormessage : error.message
