@@ -19,6 +19,11 @@ const userSchema = new Schema({
     },
     otp : {
         type : Number
+    },
+    role : {
+        type : String,
+        enum : ["admin","provider","customer"],
+        default : "customer"
     }
 })
 

@@ -4,6 +4,16 @@ exports.addBike =async (req,res)=>{
     try{
 
         const {name,brand,description,price,category} = req.body
+
+        let filename;
+        if(!req.file)
+        {
+            filename : "hello"
+        }
+        else{
+            filename : req.file.filename
+        }
+         
         if(!name || !brand || !description || !price || !category){
             return res.status(400).json({
                 message : "please probide name,brand,description,price"
@@ -15,6 +25,7 @@ exports.addBike =async (req,res)=>{
             price,
             category,
             description,
+            image : filename
         })
         res.status(200).json({
             message : "bike added successfully"
