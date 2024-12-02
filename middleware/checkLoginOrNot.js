@@ -2,7 +2,7 @@
 const jwt = require("jsonwebtoken")
 const User = require("../model/userModel")
 
-exports.checkIsLoggedInOrNot= (req,res)=>{
+exports.checkIsLoggedInOrNot= (req,res,next)=>{
     const token =req.headers.authorization //req.body ma lindane hunxa but not secure
     if(!token)
     {
@@ -28,9 +28,12 @@ exports.checkIsLoggedInOrNot= (req,res)=>{
                     message : "no user with this id is found"
                 })
             }
-            res.status(200).json({
-                message : "user is found"
-            })
+            else{
+                req.user = data
+                req.userId = data.id
+                next()
+            }
+            
         }
     })
 }

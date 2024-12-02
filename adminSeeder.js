@@ -1,10 +1,9 @@
 
 const User = require("./model/userModel")
-const user = require("./model/userModel")
 const bcrypt = require("bcryptjs")
 
 const adminSeeder = async ()=>{
-    const data = User.find({email:process.env.ADMIN_EMAIL})
+    const data =await User.find({email:process.env.ADMIN_EMAIL})
     if(data.length == 0){
         await User.create({
             email : process.env.ADMIN_EMAIL,
